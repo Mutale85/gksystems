@@ -1,0 +1,29 @@
+This project is a 7 tier
+- Orphanage
+- Real Estate
+- Transport & Logistics
+- Media
+- Hospitals
+- Academics
+- Farms
+
+The purpose of this app is to help me manage my business more efficiently by providing a 
+platform for communication and problem-solving between myself, my workers, and my clients.
+ 
+The app should be easy to use and should allow different users to access 
+only the information that is relevant to their role. For example, 
+someone working for an orphanage should only be able to access features 
+related to orphanages, while someone working in real estate should 
+only be able to access features related to real estate.
+ 
+The app should have the following features:
+ 
+- The ability to track maintenance issues for properties and vehicles, 
+such as broken windows or flat tires, and notify me when these issues arise.
+- A platform for tenants to report problems with their rental units, 
+such as a leaky faucet or faulty electrical outlet, and receive assistance from me or my workers.
+- A system for managing payments and notifying tenants when their rent is due.
+- A private and secure platform accessible only to me, my workers, and my clients, 
+with different levels of password authentication for different types of users.
+
+The app should cover the following areas of my business: orphanages, real estate, transport and logistics, farms, media, hospitals, and academics.
