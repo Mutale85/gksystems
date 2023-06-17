@@ -24,3 +24,7 @@
 <link rel="stylesheet" href="plugins/summernote/summernote-bs4.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+
+<!-- Data Tables -->
+<link rel="stylesheet" type="text/css" href="dist/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="dist/css/buttons.dataTables.min.css">

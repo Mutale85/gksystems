@@ -30,3 +30,33 @@
 <script src="dist/js/demo.js"></script>
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="dist/js/pages/dashboard.js"></script>
+
+<!-- Data Tables -->
+<script type="text/javascript" src="dist/js/jquery-3.5.1.min.js"></script>
+<script type="text/javascript" src="dist/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="dist/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="dist/js/jszip.min.js"></script>
+<script type="text/javascript" src="dist/js/pdfmake.min.js"></script>
+<script type="text/javascript" src="dist/js/vfs_fonts.js"></script>
+<script type="text/javascript" src="dist/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="dist/js/buttons.print.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+      // Find all tables with id="divTable"
+      var tables = $('table[id="allTables"]');
+      
+      // Initialize DataTables for each of these tables
+      tables.each(function() {
+        $(this).DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+                'pdfHtml5'
+            ]
+        });
+      });
+    });
+</script>

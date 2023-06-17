@@ -58,8 +58,17 @@
                                         <input type="text" class="form-control" name="phonenumber" id="phonenumber" value="260" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="team_role" class="form-label">Role</label>
-                                        <input type="text" class="form-control" name="team_role" id="team_role" required>
+                                        <label for="team_role" class="form-label">Department</label>
+                                        <select name="department" id="department" class="form-control">
+                                            <option value="">Select</option>
+                                            <option value="academics">Academics</option>
+                                            <option value="accounts">Accounts</option>
+                                            <option value="farm">Farm</option>
+                                            <option value="hospital">Hospital</option>
+                                            <option value="media">Media</option>
+                                            <option value="real-estate">Real Estate</option>
+                                            <option value="transport-logistics">Transport logistics</option>
+                                        </select>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
