@@ -2,7 +2,11 @@
     include 'includes/db.php';
 
     if(isset($_SESSION['username'])){
-        header("location:adminpanel/");
+        if($_SESSION['user_role'] == 'employee'){
+            header("location:adminpanel/members/");
+        }else{
+            header("location:adminpanel/");
+        }
     }
 ?>
 <!DOCTYPE html> 
@@ -36,8 +40,8 @@
                         <h2 class="mb-3">Login Here</h2>
                         <form id="loginForm" class="login" method="post">
                             <div class="input-group mb-3">
-                                <span class="input-group-text" id="inputGroup-sizing-default">Username</span>
-                                <input type="text" class="form-control" id="username" name="username" required>
+                                <span class="input-group-text" id="inputGroup-sizing-default">+260</span>
+                                <input type="text" class="form-control" id="phonenumber" name="phonenumber" required value="+260">
                             </div>
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="inputGroup-sizing-default">Password</span>
@@ -59,7 +63,7 @@
         
             var sign_in = document.getElementById('loginBtn');
             var LoginFormNow = document.getElementById('loginForm');
-            var username = document.getElementById('username');
+            var phonenumber = document.getElementById('phonenumber');
             var password = document.getElementById('password');
             
             var url = 'parsers/loginPage';
@@ -67,8 +71,8 @@
             
             LoginFormNow.addEventListener('submit', (event) => {
                 event.preventDefault();
-                if(username.value == ""){
-                    alert("Username is required");
+                if(phonenumber.value == ""){
+                    alert("Phonenumber is required");
                     // phone.focus();
                     return false;
                 }
@@ -90,7 +94,7 @@
                             loginsuccessNow(r);
                             setTimeout(function(){
                                 location.reload();
-                            }, 1000);
+                            }, 1500);
                         }
                         
                     }else{
