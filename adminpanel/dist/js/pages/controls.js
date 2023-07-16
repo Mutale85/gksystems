@@ -64,6 +64,7 @@ $(document).ready(function() {
           $("#department").val(data.department);
           $('#job_title').val(data.job_title);
           $("#user_role").val(data.user_role);
+          $("#employee_contract").val(data.employee_contract);
           
         }
       })
@@ -154,7 +155,6 @@ $(document).ready(function() {
       var dateFormat = "DD, d MM, yy",
         from = $( "#leaseStartDate" )
           .datepicker({
-            
             changeMonth: true,
             // numberOfMonths: 2,
             dateFormat: "DD, d MM, yy"
@@ -183,7 +183,7 @@ $(document).ready(function() {
         return date;
       }
 
-      $("#problemDate, #agreement_date").datepicker({
+      $("#problemDate, #agreement_date, #purchase_date, #transaction_date, #dueDate, #datePaid").datepicker({
         // defaultDate: "+1w",
         changeMonth: true,
         numberOfMonths: 1,
@@ -436,9 +436,7 @@ $(document).ready(function () {
           dataType: 'json',
           success: function (response) {
               if (response.success) {
-                  // Display success message
                   alert(response.message);
-                  // Optionally, reset the form
                   $('#leaseForm')[0].reset();
               } else {
                   // Display error message
@@ -468,6 +466,7 @@ $(document).ready(function () {
       })
   })
 });
+
 //==== print tenants agreement
 function printContent(el){
   $(".printBtn").css("display", "none");
@@ -581,9 +580,7 @@ $(document).ready(function() {
         $('#expenseTable').html(response);
       }
     });
-  }
-  // Call the functions to load the tables initially
-  
+  }  
   loadExpenseTable();
 
   //======== show apax graphs ===================
@@ -647,12 +644,12 @@ $(document).ready(function() {
         }
       });
     }
-
+    createGraph();
   });
   
 // ================= SENDING SMS TO EMPLOYEES ==========
   $(document).ready(function() {
-    var employeeTable = $('#employeeTable, #tenantsTable').DataTable({
+    var employeeTable = $('#employeeTable').DataTable({
       // DataTables configuration options go here
       "paging": false,
       "info": false,
@@ -686,8 +683,6 @@ $(document).ready(function() {
       });
     });
 
-    // Retrieve Tenants data from the PHP script
-
     // Update the "Send SMS/Email" button status
     function updateSendButtonStatus() {
       $('#sendButton').prop('disabled', $('.employeeCheckbox:checked').length === 0);
@@ -704,7 +699,6 @@ $(document).ready(function() {
         selectedEmployees.push($(this).val());
       });
 
-      
       // Show loading state and disable the button
       $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...');
 
@@ -733,6 +727,687 @@ $(document).ready(function() {
       });
     });
   });
+
+  // sms and email tenants
+  $(document).ready(function() {
+    var tenantTable = $('#tenantTable').DataTable({
+      // DataTables configuration options go here
+      "paging": false,
+      "info": false,
+      "searching": false
+    });
+
+    // Retrieve tenant data from the PHP script
+    $.getJSON("addons/get_tenants", function(data) {
+      // Iterate through each tenant and create a table row
+      $.each(data, function(index, tenant) {
+        var row = $('<tr>');
+        row.append($('<td>').html('<input type="checkbox" class="tenantCheckbox" value="' + tenant.phonenumber + '">'));
+        row.append($('<td>').text(tenant.phonenumber));
+        row.append($('<td>').text(tenant.firstname));
+        row.append($('<td>').text(tenant.email));
+        tenantTable.row.add(row);
+      });
+
+      // Redraw the DataTable with added rows
+      tenantTable.draw();
+
+      // Select/Deselect all checkboxes when "Select All" checkbox is clicked
+      $('#selectAllTenants').click(function() {
+        $('.tenantCheckbox').prop('checked', this.checked);
+        updateSendTenantButtonStatus();
+      });
+
+      // Enable/disable the "Send SMS/Email" button based on checkbox selection
+      $('.tenantCheckbox').click(function() {
+        updateSendTenantButtonStatus();
+      });
+    });
+
+    // Update the "Send SMS/Email" button status
+    function updateSendTenantButtonStatus() {
+      $('#sendTenantButton').prop('disabled', $('.tenantCheckbox:checked').length === 0);
+    }
+
+    // Handle the form submission
+    $('#sendTenantButton').click(function() {
+      var messageType = $('#messageType').val();
+      var messageContent = $('#messageContent').val();
+      var selectedTenants = [];
+
+      // Get the IDs of selected tenants
+      $('.tenantCheckbox:checked').each(function() {
+        selectedTenants.push($(this).val());
+      });
+
+      // Show loading state and disable the button
+      $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...');
+
+      // Send the selected tenants and message data to the server
+      $.ajax({
+        type: 'POST',
+        url: 'addons/send_message_to_tenants',
+        data: {
+          tenants: selectedTenants,
+          messageType: messageType,
+          messageContent: messageContent
+        },
+        dataType: 'json',
+        beforeSend: function() {
+          // Show loading state and disable the button
+          $('#sendTenantButton').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...');
+        },
+        success: function(response) {
+          // Handle the response from the server
+          alert(response.message);
+        },
+        error: function(xhr, status, error) {
+          // Handle errors, if any
+          console.log(error);
+        },
+        complete: function() {
+          // Reset the button state after completing the request
+          $('#sendTenantButton').prop('disabled', false).html('Send SMS/Email');
+        }
+      });
+    });
+  });
+
+
+/*
+        all about adding vehicle property, view them, editing , income, and
+
+*/
+$(document).ready(function() {
+    $('#addVehicleForm').submit(function(e) {
+        e.preventDefault(); 
+        var formData = new FormData(this);
+        $.ajax({
+            url: 'addons/add_vehicle_asset',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            beforeSend:function(){
+              $("#add_vehicle").html("Processing...");
+            },
+            success: function(response) {
+              console.log(response);
+              $("#add_vehicle").html('Add Vehicle');
+              alert('Vehicle added successfully!');
+              $('#addVehicleForm')[0].reset();
+              showLoadedVehicles();
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                alert('An error occurred while adding the vehicle.');
+            }
+        });
+    });
+});
+
+function showLoadedVehicles(){
+    var showVehicles = 'showVehicles';
+    $.ajax({
+      url: 'addons/fetch_added_vehicles',
+      type: 'POST',
+      data:{showVehicles:showVehicles},
+      success: function(response) {
+        $('#showVehicles').html(response);
+      }
+    });
+}
+showLoadedVehicles();
+
+
+//======== edit vehicle
+$(document).on('click', '.edit_vehicle', function(e) {
+    e.preventDefault();
+    var vehicleId = $(this).data('vehicle-id');
+
+    // Send an AJAX request to fetch the data for the selected vehicle
+    $.ajax({
+      type: 'POST',
+      url: 'addons/edit_vehicle', // Replace with the path to your server-side script
+      data: { vehicle_id: vehicleId },
+      dataType: 'json',
+      success: function(response) {
+        // Populate the form fields with the retrieved data
+        $("#edit_vehicle_btn").click();
+        $("#add_vehicle").html("Update Details");
+        $('#year').val(response.year);
+        $('#vehicle_id').val(response.id);
+        $('#make').val(response.make);
+        $('#model').val(response.model);
+        $('#color').val(response.color);
+        $('#license_plate').val(response.license_plate);
+        $('#vin').val(response.vin);
+        $('#purchase_date').val(response.purchase_date);
+        $('#currency').val(response.currency);
+        $('#purchase_price').val(response.purchase_price);
+        $('#purchase_mileage').val(response.purchase_mileage);
+        $('#driver').val(response.driver);
+        // Add more form fields if needed
+      },
+      error: function(xhr, status, error) {
+        console.log(xhr.responseText);
+      }
+    });
+});
+
+$(document).on('click', '.vehicle_details', function(e) {
+    e.preventDefault();
+    var vehicleId = $(this).attr('href');
+
+    $.ajax({
+      type: 'POST',
+      url: 'addons/fetch_added_vehicles',
+      data: { vehicle_id: vehicleId },
+      
+      success: function(response) {
+        // Populate the form fields with the retrieved data
+        $("#resultsBtn").click();
+        $("#details_modal").html(response);
+        $("#resultsModalLabel").text("Vehicle Details"); 
+      }
+    })
+});
+
+/*
+   about adding farm property, view them, editing 
+*/
+// ========= driver posting daily income ====
+
+
+$(document).ready(function() {
+  // Disable form submission if already posted today
+  var currentDate = new Date().toISOString().slice(0, 10);
+  if (localStorage.getItem('lastPostingDate') === currentDate) {
+    $('#incomeForm :input').prop('disabled', true);
+  }
+
+  $('#incomeForm').submit(function(e) {
+    e.preventDefault();
+    var form = $(this);
+    if (form[0].checkValidity() === false) {
+      e.stopPropagation();
+    } else {
+      $.ajax({
+        url: 'addons/submit_driver_income_form',
+        type: 'POST',
+        data: form.serialize(),
+        success: function(response) {
+          console.log(response); 
+          alert(response);
+          $('#incomeForm :input').prop('disabled', true);
+          localStorage.setItem('lastPostingDate', currentDate);
+        }
+      });
+    }
+    form.addClass('was-validated');
+  });
+});
+
+// =========== fetch added vehicle income ==========
+function vehicleIncomeTable() {
+  var income = 'income';
+  $.ajax({
+    url: 'addons/fetch_vehicle_income',
+    type: 'POST',
+    data:{income:income},
+    success: function(response) {
+      $('#vehicle_income').html(response);
+    }
+  });
+}
+vehicleIncomeTable();
+
+
+
+$(document).ready(function() {
+  var chartType = 'bar'; // Initial chart type
+
+  // Fetch monthly income data from the database via AJAX
+  $.ajax({
+    url: 'addons/fetch_monthly_income',
+    type: 'GET',
+    dataType: 'json',
+    success: function(response) {
+      // Generate the chart when data is successfully retrieved
+      generateChart(response, chartType);
+    },
+    error: function(xhr, status, error) {
+      // Handle error response
+      console.log(error);
+    }
+  });
+
+  // Function to generate the ApexCharts chart
+  function generateChart(data, type) {
+    var options = {
+      chart: {
+        type: type,
+        height: 350,
+        toolbar: {
+          show: false
+        }
+      },
+      series: [{
+        name: 'Income',
+        data: data
+      }],
+      xaxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      },
+      yaxis: {
+        title: {
+          text: 'Income'
+        },
+        labels: {
+          formatter: function(value) {
+            return 'ZMW ' + value.toLocaleString();
+          }
+        },
+        plotOptions: {
+          bar: {
+            colors: {
+              ranges: [{
+                from: -Infinity,
+                to: Infinity,
+                color: '#CDDC39' // Lemon Green
+              }]
+            }
+          }
+        }
+      }
+    };
+
+    var chart = new ApexCharts(document.querySelector('#incomechartContainer'), options);
+    chart.render();
+  }
+
+  // Function to toggle between chart types
+  function toggleChartType() {
+    if (chartType === 'bar') {
+      chartType = 'line';
+    } else {
+      chartType = 'bar';
+    }
+
+    // Fetch new data and generate the updated chart
+    $.ajax({
+      url: 'addons/fetch_monthly_income',
+      type: 'GET',
+      dataType: 'json',
+      success: function(response) {
+        generateChart(response, chartType);
+      },
+      error: function(xhr, status, error) {
+        console.log(error);
+      }
+    });
+  }
+
+  // Event listener for the chart type button
+  $('#chartTypeButton').click(function() {
+    toggleChartType();
+  });
+});
+
+/* Farms properties, adding, display, editing
+
+*/
+
+$(document).ready(function() {
+  $('#addFarmForm').submit(function(e) {
+    e.preventDefault();
+    var formData = new FormData(this);
+    $.ajax({
+      url: 'addons/add_farm_asset',
+      type: 'POST',
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      beforeSend:function(){
+        $("#farmBtn").html("Processing...");
+      },
+      success: function(response) {
+        alert(response);
+        $("#farmBtn").html("Add Farm");
+        showLoadedFarms();
+      }
+    });
+  });
+});
+
+function showLoadedFarms(){
+    var showFarms = 'showFarms';
+    $.ajax({
+      url: 'addons/fetch_added_farms',
+      type: 'POST',
+      data:{showFarms:showFarms},
+      success: function(response) {
+        $('#showFarms').html(response);
+      }
+    });
+}
+showLoadedFarms();
+
+
+//======== edit vehicle
+$(document).on('click', '.edit_farm', function(e) {
+    e.preventDefault();
+    var farmId = $(this).data('farm-id');
+
+    // Send an AJAX request to fetch the data for the selected farm
+    $.ajax({
+      type: 'POST',
+      url: 'addons/edit_farm', // Replace with the path to your server-side script
+      data: { farm_id: farmId },
+      dataType: 'json',
+      success: function(response) {
+        // Populate the form fields with the retrieved data
+        $("#addFarmbtn").click();
+        $("#farmBtn").html("Update Details");
+        $('#activity').val(response.activity);
+        $('#location').val(response.location);
+        $('#address').val(response.address);
+        $('#purchase_amount').val(response.purchase_amount);
+        $('#current_value').val(response.current_value);
+        $('#purchase_date').val(response.purchase_date);
+        $('#farm_size').val(response.farm_size);
+        $('#measurement').val(response.measurement);
+        $('#currency').val(response.currency_amount);
+        $('#currency').val(response.currency_value);
+        $('#farm_id').val(response.farm_id);
+        // Add more form fields if needed
+      },
+      error: function(xhr, status, error) {
+        console.log(xhr.responseText);
+      }
+    });
+});
+
+$(document).on('click', '.farm_details', function(e) {
+    e.preventDefault();
+    var farmId = $(this).attr('href');
+    $.ajax({
+      type: 'POST',
+      url: 'addons/fetch_added_farms',
+      data: { farm_id: farmId },
+      
+      success: function(response) {
+        $("#resultsBtn").click();
+        $("#details_modal").html(response);
+        $("#resultsModalLabel").text("Farm Details"); 
+      }
+    })
+});
+
+
+
+/*
+  Real Estate Addition, Editing, 
+*/
+
+$(document).ready(function() {
+  $('#addRealEstateForm').submit(function(e) {
+    e.preventDefault();
+    var formData = new FormData(this);
+    $.ajax({
+      url: 'addons/add_real_estate_asset',
+      type: 'POST',
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      beforeSend:function(){
+        $("#real_estateBtn").html("Processing...");
+      },
+      success: function(response) {
+        alert(response);
+        $("#real_estateBtn").html("Add Real Estate");
+        showLoadedreal_estates();
+      }
+    });
+  });
+});
+
+function showLoadedreal_estates(){
+    var showreal_estates = 'showreal_estates';
+    $.ajax({
+      url: 'addons/fetch_added_real_estates',
+      type: 'POST',
+      data:{showreal_estates:showreal_estates},
+      success: function(response) {
+        $('#showreal_estates').html(response);
+      }
+    });
+}
+showLoadedreal_estates();
+
+
+//======== edit vehicle
+$(document).on('click', '.edit_real_estate', function(e) {
+    e.preventDefault();
+    var real_estateId = $(this).data('real_estate-id');
+
+    // Send an AJAX request to fetch the data for the selected real_estate
+    $.ajax({
+      type: 'POST',
+      url: 'addons/edit_real_estate', // Replace with the path to your server-side script
+      data: { real_estate_id: real_estateId },
+      dataType: 'json',
+      success: function(response) {
+        // Populate the form fields with the retrieved data
+        $("#add_real_estateBtn").click();
+        $("#real_estateBtn").html("Update Details");
+        $('#category').val(response.category);
+        $('#condition').val(response.condition);
+        $('#location').val(response.location);
+        $('#address').val(response.address);
+        $('#purchase_amount').val(response.purchase_amount);
+        $('#current_value').val(response.current_value);
+        $('#currency_amount').val(response.currency);
+        $('#currency_value').val(response.currency);
+        $('#currency_state').val(response.currency);
+        $('#purchase_date').val(response.purchase_date);
+        $('#rental_amount').val(response.rental_amount);
+        $('#current_state').val(response.current_state);
+        $('#estate_id').val(response.estate_id);
+        // Add more form fields if needed
+      },
+      error: function(xhr, status, error) {
+        console.log(xhr.responseText);
+      }
+    });
+});
+
+$(document).on('click', '.real_estate_details', function(e) {
+    e.preventDefault();
+    var real_estateId = $(this).attr('href');
+    $.ajax({
+      type: 'POST',
+      url: 'addons/fetch_added_real_estates',
+      data: { real_estateId: real_estateId },
+      
+      success: function(response) {
+        $("#resultsBtn").click();
+        $("#details_modal").html(response);
+        $("#resultsModalLabel").text("Real Estate Details"); 
+      }
+    })
+});
+
+
+//============== fetchRentals 
+
+function fetchRentals(house_number){
+  $.ajax({
+    type: 'POST',
+    url: 'addons/fetch_rentals',
+    data: { house_number: house_number },
+    dataType: 'json',
+    success: function(response) {
+      
+      $('#rentAmount').val(response.rental_amount);
+      $('#currency').val(response.currency);
+      
+    },
+    error: function(xhr, status, error) {
+      console.log(xhr.responseText);
+    }
+  });
+}
+
+
+// petty cash  petty cashpetty cash petty cashpetty cash petty cash petty cash petty cash
+$(document).ready(function() {
+  $('#pettyCashForm').submit(function(event) {
+    event.preventDefault(); 
+    var formData = $(this).serialize();
+    $.ajax({
+      url: 'addons/submitPettyCash',
+      type: 'POST',
+      data: formData,
+      success: function(response) {
+        // if (response === 'success') {
+        //   alert('Form submitted successfully!');
+        //   // Clear form fields
+          $('#pettyCashForm')[0].reset();
+        // } else {
+        //   alert('Form submission failed.');
+        // }
+        alert(response);
+        fetchData();
+      }
+    });
+  });
+});
+  // Fetch and display data in a table
+function fetchData() {
+  var petty_cash = 'petty_cash';
+  $.ajax({
+    url: 'addons/fetch_petty_cash',
+    type: 'POST',
+    data: {petty_cash:petty_cash},
+    success: function(data) {
+      $('#petty_cash').html(data);
+    }
+  });
+}
+fetchData();
+
+$(document).ready(function() {
+  $('#loanForm').submit(function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+    $.ajax({
+      type: 'POST',
+      url: 'addons/submitLoan',
+      data: formData,
+      beforeSend:function(){
+        $("#loansBtn").html("Processing...");
+      },
+      success: function(response) {
+        alert(response);
+        $('#loanForm')[0].reset();
+        $("#loansBtn").html("Add Loan");
+        displayPostedLoans();
+      }
+    });
+  });
+});
+
+function displayPostedLoans() {
+  var fetch_loans = 'fetch_loans';
+  $.ajax({
+    type: 'POST',
+    url: 'addons/fetch_loans',
+    data:{fetch_loans:fetch_loans},
+    success: function(response) {
+      $('#postedLoans').html(response);
+    }
+  });
+}
+
+
+
+$(document).on("click", ".edit_loan", function(e){
+  e.preventDefault();
+  var loan_id = $(this).attr("href");
+  $.ajax({
+    url:"addons/editLoan",
+    method:"post",
+    data:{loan_id:loan_id},
+    dataType:'Json',
+    success:function(loanData){
+      $("#loanBtn").click();
+      $("#add_loan").html("Update Details");
+      $("#loan_id").val(loanData.id);
+      $('#currency').val(loanData.currency);
+      $('#loanType').val(loanData.loan_type);
+      $('#creditor').val(loanData.creditor);
+      $('#amount').val(loanData.amount);
+      $('#currency').val(loanData.currency);
+      $('#dueDate').val(loanData.due_date);
+      $('#status').val(loanData.status);
+
+    }
+  })
+})
+
+$(document).on("click", ".add_payment", function(e){
+  e.preventDefault();
+  var loan_id = $(this).attr("href");
+  $("#paymentbtn").click();
+  $("#loanId").val(loan_id);
+})
+
+// loan payment 
+
+$(document).ready(function() {
+  $('#paymentForm').submit(function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+    $.ajax({
+      type: 'POST',
+      url: 'addons/submitLoanPayment',
+      data: formData,
+      beforeSend:function(){
+        $("#submit_paymentBtn").html("Processing...");
+      },
+      success: function(response) {
+        alert(response);
+        $('#paymentForm')[0].reset();
+        $("#submit_paymentBtn").html("Add Loan");
+        displayPostedLoans();
+      }
+    });
+  });
+});
+
+
+
+$(document).on("click", ".view_loan_payments", function(e){
+  e.preventDefault();
+  var loan_id = $(this).attr("href");
+  $("#resultsBtn").click();
+  $.ajax({
+      url: "addons/fetch_loan_payments",
+      method:"post",
+      data:{loan_id:loan_id},
+      success:function(data){
+          $("#details_modal").html(data);
+      }
+  })
+})
+
+
+
+
+
   
 
 

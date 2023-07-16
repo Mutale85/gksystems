@@ -54,7 +54,7 @@
             // Iterate through selected employees and send emails
             foreach ($selectedEmployees as $employeeID) {
                 // Retrieve the employee email from the database based on the ID
-                $employeeEmail = getEmailFromDatabase($employeeID);
+                $employeeEmail = getEmployeeEmailFromDatabase($employeeID);
 
                 // Set recipient information
                 $mail->addAddress($employeeEmail);
@@ -87,12 +87,4 @@
         echo json_encode($response);
     }
 
-    // Function to retrieve the employee email from the database based on the ID
-    function getEmailFromDatabase($employeeID) {
-        global $connect;
-        $statement = $connect->prepare("SELECT email FROM team_members WHERE phonenumber = ? AND email != '' ");
-        $statement->execute([$employeeID]);
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
-        return $result['email'];
-    }
 ?>

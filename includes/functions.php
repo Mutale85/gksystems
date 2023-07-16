@@ -383,7 +383,7 @@
     }
 
 
-    // incident details reporting by transport =====
+    //============ incident details reporting by transport =====
     function getReporterByPhone($phonenumber){
         global $connect;
         $output = '';
@@ -579,4 +579,407 @@
         header('Content-Type: application/json');
         echo json_encode($response);
   	}
+
+    function SEND_SMSNOW($to, $message, $api_key, $sender_id){
+		global $connect;
+        $output = "";
+		$query = $connect->prepare("SELECT * FROM `sms_counter` ");
+	  	$query->execute();
+        if($query->rowCount() > 0){
+            $result = $query->fetch();
+            $balance = $result['remaining_sms'];
+            if($balance > 0){
+                $url = 'https://bulksms.zamtel.co.zm/api/v2.1/action/send/api_key/'.$api_key.'/contacts/'.$to.'/senderId/'.$sender_id.'/message/'.$message.'';
+                $gateway_url = $url;
+                try {
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $gateway_url);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    curl_setopt($ch, CURLOPT_HTTPGET, 1);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+                    $output = curl_exec($ch);
+                    // we add sms counting 
+                    $sql = $connect->prepare("INSERT INTO `sms_counter` (`receiver`, `message`) VALUES(?, ?) ");
+                    $sql->execute([$to, $message]);
+                    $updatedSmsCount = $balance - 1;
+                    $update = $connect->prepare("UPDATE `sms_counter` SET `remaining_sms` = ? ");
+                    $update->execute([$updatedSmsCount]);
+                    
+                    $output = 'SMS sent successfully.';
+                
+
+                    if (curl_errno($ch)) {
+                        $output = curl_error($ch);
+                    }
+                    curl_close($ch);
+                    
+                }catch (Exception $exception){
+                    $output = $exception->getMessage();
+                }
+            }else{
+                
+                $output = 'Contact admin: 260976330092';
+                
+                exit();
+            } 
+        }else{
+            $sql = $connect->prepare("INSERT INTO `sms_counter` (`receiver`, `message`) VALUES(?, ?) ");
+            $sql->execute([$to, $message]);
+            $update = $connect->prepare("UPDATE `sms_counter` SET `remaining_sms` = remaining_sms - 1 ");
+            $update->execute();
+        }
+
+        
+        return $output;
+  	}
+
+    // Function to retrieve the employee email from the database based on the ID
+    function getEmployeeEmailFromDatabase($employeeID) {
+        global $connect;
+        $statement = $connect->prepare("SELECT email FROM team_members WHERE phonenumber = ? AND email != '' ");
+        $statement->execute([$employeeID]);
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        return $result['email'];
+    }
+
+    // Function to retrieve the tenant email from the database based on the ID
+
+    function getTenantsEmailFromDatabase($tenantID) {
+        global $connect;
+        $statement = $connect->prepare("SELECT email FROM tenants WHERE phonenumber = :id");
+        $statement->bindParam(':id', $tenantID);
+        $statement->execute();
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        return $result['email'];
+    }
+
+    function formatDate($agreement) {
+        // Check if input date format is "l, d F, Y"
+        $inputFormat = "l, d F, Y";
+        $isInputFormat = DateTime::createFromFormat($inputFormat, $agreement) !== false;
+    
+        // Convert to "Y-m-d" if input format is "l, d F, Y"
+        if ($isInputFormat) {
+            $date = DateTime::createFromFormat($inputFormat, $agreement);
+            return $date->format("Y-m-d");
+        }
+    
+        // Return input date as-is if it's already in "Y-m-d" format
+        return $agreement;
+    }
+    
+
+    function fetchVehicleAssets(){
+        global $connect;
+        $stmt = $connect->query("SELECT * FROM vehicles");
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            extract($row);
+        ?>
+        <tr>
+            <td><?php echo $license_plate?></td>
+            <td><?php echo $vin?></td>
+            <td><a href="employees/details?ID=<?php echo base64_encode($driver)?>"><?php echo getReporterByPhone($driver)?></a></td>
+            <td>
+                <div class="btn-group">
+                <a href='<?php echo $license_plate?>' class="btn btn-primary btn-sm edit_vehicle" data-vehicle-id="<?php echo $id?>"><i class="bi bi-pen"></i> Edit</a> <a href='<?php echo $license_plate?>' class="btn btn-secondary btn-sm vehicle_details" data-vehicle-id="<?php echo $id?>"><i class="bi bi-car-front"></i> Details</a>
+                </div>
+            </td>
+        </tr>
+    <?php
+        }
+    }
+
+    function getVehicleRegNumberByDriverID($driver){
+        global $connect;
+        $stmt = $connect->prepare(" SELECT * FROM vehicles WHERE driver = ? ");
+        $stmt->execute([$driver]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row['license_plate'];
+        
+    }
+
+
+    // =========== Vehicle Income Functions ==========
+
+    function getVehicleIncome($driver){
+        echo vehicleIncomeTable();
+        global $connect;
+        $sql = $connect->prepare("SELECT * FROM daily_income WHERE driver = ? ORDER BY created_at DESC");
+        $sql->execute([$driver]);
+        foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row ){
+            extract($row);
+        ?>
+            <tr>
+                <td><?php echo $vehicle_reg_number?></td>
+                <td><?php echo $currency?> <?php echo $income_amount?></td>
+                <td><?php echo  date("j F, Y H:i:s", strtotime($created_at))?></td>
+                <td><?php echo $vehicle_status?></td>
+            </tr>
+        <?php
+        } 
+
+        echo vehicleIncomeTableFooter($driver);
+    }
+
+    function vehicleIncomeTable(){
+        $output = '
+            <thead>
+                <tr>
+                    <th>Plate No.</th>
+                    <th>Amount</th>
+                    <th>Date Added</th>
+                    <th>Vehicle status</th>
+                </tr>
+            </thead>
+            <tbody id="vehicle_income">
+        ';
+        return $output;
+    }
+
+    function vehicleIncomeTableFooter($driver){
+        $output = '
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Total </th>
+                    <th>'.getTotalVehicleIncome($driver).'</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        ';
+        return $output;
+    }
+
+    function getTotalVehicleIncome($driver){
+        global $connect;
+        $query = $connect->prepare("SELECT * FROM daily_income WHERE driver = ? ");
+        $query->execute([$driver]);
+        if($query->rowCount() > 0){
+            $row = $query->fetch(PDO::FETCH_ASSOC);
+            return $row['currency'].' '.$row['total_income'];
+        }
+        
+    }
+
+    function counVehicleTransactions($driver){
+        global $connect;
+        $query = $connect->prepare("SELECT * FROM daily_income WHERE driver = ? ");
+        $query->execute([$driver]);
+        $result = $query->rowCount();
+        return $result;
+    }
+
+
+    // ====== INCOME REPORT FOR SUPERADMIN =========
+
+    function getVehicleIncomeReport(){
+        echo vehicleIncomeTableReport();
+        global $connect;
+        $sql = $connect->prepare("SELECT * FROM daily_income ORDER BY created_at DESC");
+        $sql->execute();
+        foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row ){
+            extract($row);
+        ?>
+            <tr>
+                <td><a href="<?php echo $vehicle_reg_number?>" class="vehicle_details"> <?php echo $vehicle_reg_number?></a></td>
+                <td><?php echo  date("j F, Y H:i:s", strtotime($created_at))?></td>
+                <td><?php echo $vehicle_status?></td>
+                <td><a href="employees/details?ID=<?php echo base64_encode($driver)?>"> <?php echo getReporterByPhone($driver)?></a></td>
+                <td><?php echo $currency?> <?php echo $income_amount?></td>
+            </tr>
+        <?php
+        } 
+
+        echo vehicleIncomeTableFooterReport();
+    }
+
+    function vehicleIncomeTableReport(){
+        $output = '
+            <thead>
+                <tr>
+                    <th>Plate No.</th>
+                    <th>Date Added</th>
+                    <th>Vehicle Status</th>
+                    <th>Driver </th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody id="vehicle_income_report">
+        ';
+        return $output;
+    }
+
+    function vehicleIncomeTableFooterReport(){
+        $output = '
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Total </th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th>'.getTotalVehicleIncomeReport().'</th>
+                </tr>
+            </tfoot>
+        ';
+        return $output;
+    }
+
+    function getTotalVehicleIncomeReport(){
+        global $connect;
+        $query = $connect->prepare("SELECT * FROM daily_income ");
+        $query->execute();
+        if($query->rowCount() > 0){
+            $row = $query->fetch(PDO::FETCH_ASSOC);
+            return $row['currency'].' '.$row['total_income'];
+        }
+        
+    }
+
+    function counVehicleTransactionsReport(){
+        global $connect;
+        $query = $connect->prepare("SELECT * FROM daily_income ");
+        $query->execute();
+        $result = $query->rowCount();
+        return $result;
+    }
+    /*
+        all about adding farm property, view them, editing 
+
+    */ 
+
+    function fetchFarmAssets(){
+        global $connect;
+        $query = $connect->prepare("SELECT * FROM farms");
+        $query->execute();
+        $result = $query->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($result as $row) {
+            extract($row);
+        ?>
+        <tr>
+            <td><?php echo $activity?></td>
+            <td><?php echo $address?></td>
+            <td><?php echo $farm_size?> <?php echo $measurement?></a></td>
+            <td>
+                <div class="btn-group">
+                <a href='<?php echo $farm_id?>' class="btn btn-primary btn-sm edit_farm" data-farm-id="<?php echo $farm_id?>"><i class="bi bi-pen"></i> Edit</a> <a href='<?php echo $farm_id?>' class="btn btn-secondary btn-sm farm_details" data-farm-id="<?php echo $farm_id?>"><i class="bi bi-car-front"></i> Details</a>
+                </div>
+            </td>
+        </tr>
+    <?php
+        } 
+    }
+
+
+    /*Real Estates Function*/
+
+    function fetchRealEstateAssets(){
+        global $connect;
+        $query = $connect->prepare("SELECT * FROM estates");
+        $query->execute();
+        $result = $query->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($result as $row) {
+            extract($row);
+        ?>
+        <tr>
+            <td><?php echo $address?>, <?php echo $location?></td>
+            <td><?php echo $condition?></td>
+            <td><?php echo $current_state?></a></td>
+            <td>
+                <div class="btn-group">
+                <a href='<?php echo $estate_id?>' class="btn btn-primary btn-sm edit_real_estate" data-real_estate-id="<?php echo $estate_id?>"><i class="bi bi-pen"></i> Edit</a> <a href='<?php echo $estate_id?>' class="btn btn-secondary btn-sm real_estate_details" data-real_estate-id="<?php echo $estate_id?>"><i class="bi bi-car-front"></i> Details</a>
+                </div>
+            </td>
+        </tr>
+    <?php
+        } 
+    }
+
+
+    // ========= Petty Cash =======
+    
+    function pettyCash(){
+        global $connect;
+        $query = $connect->prepare("SELECT * FROM petty_cash_transactions");
+        $query->execute();
+        $data = $query->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($data as $row ) {
+            if($row['debit'] == 0.00){
+                $debit = '';
+            }else{
+                $debit =  'ZMW '. $row['debit'];
+            }
+            if($row['credit'] == 0.00){
+                $credit = '';
+            }else{
+                $credit =  'ZMW '. $row['credit'];
+            }
+
+            echo '<tr>';
+            echo '<td>' . date("j F, Y", strtotime($row['date'])). '</td>';
+            echo '<td>' . $row['description'] . '</td>';
+            echo '<td>' . $debit . '</td>';
+            echo '<td>' . $credit. '</td>';
+            // echo '<td>' . $row['transaction_type'] . '</td>';
+            // echo '<td>' . $row['payment_mode'] . '</td>';
+            echo '<td>ZMW ' . $row['balance'] . '</td>';
+            echo '</tr>';
+        }
+    }
+
+    function getBalance(){
+        global $connect;
+        $query = $connect->prepare("SELECT balance FROM petty_cash_transactions ORDER BY id DESC LIMIT 1 ");
+        $query->execute();
+        if($query->rowCount() > 0 ){
+            $row = $query->fetch(PDO::FETCH_ASSOC);
+            $balance =  $row['balance'];
+            if($balance == 0.00){
+                exit;
+            }
+        }else{
+            $balance = 0.00;
+        }
+        return $balance;
+    }
+
+    function fetchLoans(){
+        global $connect;
+        $query = $connect->prepare("SELECT * FROM `loans` ");
+        $query->execute();
+        $loans = $query->fetchAll();
+        $html = '';
+        foreach ($loans as $loan) {
+            $html .= '<tr>';
+            $html .= '<td>' . $loan['loan_type'] . '</td>';
+            $html .= '<td>' . $loan['creditor'] . '</td>';
+            $html .= '<td>' . $loan['currency'] . ' ' . $loan['amount'] . '</td>';
+            $html .= '<td>' . date("j M, Y", strtotime($loan['due_date'])) . '</td>';
+            $html .= '<td>'.daysToGo($loan['due_date']).'</td>';
+            $html .= '<td>' . $loan['status'] . '</td>';
+            $html .= '<td>
+                        <div class="btn-group">
+                            <a href="'.$loan['id'].'" class="btn btn-secondary btn-sm add_payment"> Payment</a>
+                            <a href="'.$loan['id'].'" class="btn btn-primary btn-sm edit_loan"> Edit</a>
+                            <a href="'.$loan['id'].'" class="btn btn-secondary btn-sm view_loan_payments"> View</a>
+                        </div>
+                    </td>';
+            $html .= '</tr>';
+        }
+        return $html;
+    }
+
+
+    function daysToGo($date){
+        $startDate = new DateTime($date);
+        // Get the current date
+        $currentDate = new DateTime();
+        // Calculate the difference in days
+        $interval = $currentDate->diff($startDate);
+        $days = $interval->days;
+
+        return $days;
+    }
 ?>

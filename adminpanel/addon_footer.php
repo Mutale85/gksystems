@@ -52,6 +52,15 @@
                             <option value="admin">Admin</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="team_role" class="form-label">Employee Contract</label>
+                        <select name="employee_contract" id="employee_contract" class="form-control">
+                            <option value="">Select</option>
+                            <option value="Permanent">Permanent</option>
+                            <option value="Intern">Intern</option>
+                            <option value="Casual / Short Term">Casual / Short Term</option>
+                        </select>
+                    </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="submit" id="add_employee" class="btn btn-primary">Add Employee</button>
@@ -127,4 +136,8 @@
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 <!-- Apex Chart -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<!-- JS -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 

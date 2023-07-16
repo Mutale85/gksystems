@@ -32,6 +32,14 @@
 <!-- date picker -->
 
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+<!--  -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+<style>
+    a:link, a:active {
+        text-decoration: none;
+    }
+</style>
 <?php 
     // if(empty($_SESSION['username'])){
     //     header("location:../signout");

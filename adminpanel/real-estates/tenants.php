@@ -97,7 +97,17 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="house_number" class="form-label">House Number:</label>
-                                        <input type="text" class="form-control" name="house_number" id="house_number" required>
+                                        <select  class="form-control" name="house_number" id="house_number" required onchange="fetchRentals(this.value)">
+                                            <option value="">Select House</option>
+                                            <?php 
+                                                $query = $connect->prepare("SELECT * FROM estates");
+                                                $query->execute();
+                                                foreach ($query->fetchAll() as $row) {
+                                                    echo '<option value="'.$row['address'].'">'.$row['address'].' ('.$row['current_state'].')</option>';
+                                                }
+                                            ?>
+                                        </select>
+                                        <!-- <input type="text" class="form-control" name="house_number" id="house_number" required> -->
                                     </div>
 
                                     <div class="mb-3">
@@ -105,7 +115,7 @@
                                         <input type="number" class="form-control" name="num_people" id="num_people" min="1" required>
                                         <input type="hidden" name="tenant_id" id="tenant_id">
                                     </div>
-                                    <h4>Rent Details</h4>
+                                    <h5 class="mt-3 mb-3">Rent Details</h5>
                                     <div class="mb-3">
                                         <label for="leaseStartDate" class="form-label">Lease Start Date</label>
                                         <input type="text" class="form-control" name="leaseStartDate" id="leaseStartDate">

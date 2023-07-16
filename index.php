@@ -36,24 +36,92 @@
                     </div>
                     </div>
                     <div class="col-lg-6">
-                    <div class="right-image wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.5s">
-                        <h2 class="mb-3">Login Here</h2>
-                        <form id="loginForm" class="login" method="post">
-                            <div class="input-group mb-3">
-                                <span class="input-group-text" id="inputGroup-sizing-default">+260</span>
-                                <input type="text" class="form-control" id="phonenumber" name="phonenumber" required value="+260">
-                            </div>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text" id="inputGroup-sizing-default">Password</span>
-                                <input type="password" class="form-control" id="password" name="password" required>
-                                <span class="input-group-text" id="showpass_text" onclick="passReveal()"><i class="bi bi-eye"></i></span>
-                            </div>
-                            <div class="white-button first-button scroll-to-section">
-                                <button class="btn btn-secondary w-100" id="loginBtn" type="submit">Login</button>
-                            </div>
-                            <?php echo base64_decode('RW1tYW51ZWwyMDE1'); ?>
-                        </form>
-                    </div>
+                        <div class="right-image wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.5s">
+                            <h2 class="mb-3">Login Here</h2>
+                            <form id="loginForm" class="login" method="post">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">+260</span>
+                                    <input type="text" class="form-control" id="phonenumber" name="phonenumber" required value="+260">
+                                </div>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">Password</span>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                    <span class="input-group-text" id="showpass_text" onclick="passReveal()"><i class="bi bi-eye"></i></span>
+                                </div>
+                                <div class="white-button first-button scroll-to-section">
+                                    <button class="btn btn-secondary w-100" id="loginBtn" type="submit">Login</button>
+                                </div>
+                                
+                            </form>
+                        </div>
+                        <table class="table table-bordered">
+                            <thead>
+                                <th>Tenants ID</th>
+                                <th>Password</th>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                    $query = $connect->prepare("SELECT * FROM tenants");
+                                    $query->execute();
+                                    foreach($query->fetchAll() as $row){
+                                        extract($row);
+                                ?>
+                                <tr>
+                                    <td><?php echo $phonenumber?></td>
+                                    <td><?php echo ($pw)?></td>
+                                </tr>
+                                <?php
+                                    }
+                                ?>
+                            </tbody>
+                        </table>
+                        <h4>Employees</h4>
+                        <table class="table table-bordered">
+                            <thead>
+                                <th>Employee ID</th>
+                                <th>Password</th>
+                                <th>Title</th>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                    $query = $connect->prepare("SELECT * FROM team_members WHERE user_role = 'employee' ");
+                                    $query->execute();
+                                    foreach($query->fetchAll() as $row){
+                                        extract($row);
+                                ?>
+                                <tr>
+                                    <td><?php echo $phonenumber?></td>
+                                    <td><?php echo base64_decode($pass_w)?></td>
+                                    <td><?php echo $job_title?></td>
+                                </tr>
+                                <?php
+                                    }
+                                ?>
+                            </tbody>
+                        </table>
+
+                        <h4>SuperAdmin</h4>
+                        <table class="table table-bordered">
+                            <thead>
+                                <th>SuperAdmin ID</th>
+                                <th>Password</th>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                    $query = $connect->prepare("SELECT * FROM team_members WHERE user_role != 'employee' ");
+                                    $query->execute();
+                                    foreach($query->fetchAll() as $row){
+                                        extract($row);
+                                ?>
+                                <tr>
+                                    <td><?php echo $phonenumber?></td>
+                                    <td><?php echo base64_decode($pass_w)?></td>
+                                </tr>
+                                <?php
+                                    }
+                                ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 </div>

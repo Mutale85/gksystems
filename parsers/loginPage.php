@@ -4,9 +4,10 @@
 	if (isset($_POST['phonenumber'])) {
 		$phonenumber = trim(filter_input(INPUT_POST, 'phonenumber', FILTER_SANITIZE_SPECIAL_CHARS));
 		$p_word = trim(filter_input(INPUT_POST, 'password', FILTER_SANITIZE_SPECIAL_CHARS));
+		$phonenumber = trim(rtrim($phonenumber));
+		$p_word = trim(rtrim($p_word));
 		
-		
-		if ($phonenumber === "") {
+		if ($phonenumber == "") {
 			echo "Phonenumber is empty";
 			exit();
 		}

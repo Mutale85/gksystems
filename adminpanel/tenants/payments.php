@@ -18,44 +18,29 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                
+                <button type="button" class="btn btn-primary mb-4" id="btnModal" data-toggle="modal" data-target="#paymentModal">
+                    Add Payment
+                </button>
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Rent Payments Table </h4>
+                            <h4 class="card-title">Payments</h4>
                         </div>
                         <div class="card-body">
                             <div class="table table-responsive">
                                 <table class="table table-bordered" id="allTables">
                                     <thead>
                                         <tr>
-                                            <th>Rent ID</th>
-                                            <th>Month Paid For</th>
+                                            <th>Payment ID</th>
                                             <th>Payment date</th>
-                                            <th>Next Payment </th>
+                                            <th>Payment Status</th>
                                             <th>Details</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <?php 
-                                        $query = $connect->prepare("SELECT * FROM problem_reports WHERE reporter_id = ? ");
-                                        $query->execute([$_SESSION['phonenumber']]);
-                                        foreach($query->fetchAll() as $row){
-                                            extract($row);
-                                    ?>
-                                        <tr>
-                                            <td><?php echo $reference?></td>
-                                            <td><?php echo $problemType?></td>
-                                            <td><?php echo date("j F Y", strtotime($problemDate))?></td>
-                                            <td><?php echo ucwords($status)?></td>
-                                            <td><a href="<?php echo $reference?>" class="btn btn-primary btn-sm view_report_details"><i class="bi bi-box"></i> Details</a></td>
-                                        </tr>
-                                    <?php        
-                                        }
-                                    ?>
+
                                     </tbody>
                                 </table>
                             </div>
-                            
                         </div>
                         <div class="card-footer">
                             
@@ -66,74 +51,63 @@
         </div>
 
         <!-- tenants modal -->
-        <div class="modal fade" id="reportModal"  aria-labelledby="reportModalLabel" aria-hidden="true">
+        <div class="modal fade" id="paymentModal"  aria-labelledby="paymentModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="reportModalLabel">Tenant Problem Report Form</h5>
+                        <h5 class="modal-title" id="paymentModalLabel">Tenant Payment Form</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <form id="problemReportForm" method="POST" enctype="multipart/form-data">
-                            <!-- <div class="mb-3">
-                                <label for="title">Problem Title</label>
-                                <input type="text" name="problemTitle" id="problemTitle" class="form-control" >
-                            </div> -->
+                        <!-- <form id="paymentReportForm" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="tenant" id="tenant" class="form-control" value="<?php echo $_SESSION['firstname'].' ' . $_SESSION['lastname']?>">
+                            <input type="hidden" name="tenant_id" id="tenant_id" class="form-control" value="<?php echo  $_SESSION['phonenumber']?>">
+                        
                             <div class="mb-3">
-                                <label for="problemType" class="form-label">Problem Type</label>
-                                <input type="text" class="form-control" id="problemType" name="problemType" list="problemTypes">
-                                <datalist id="problemTypes">
-                                    <option value="Appliance Malfunction"> Appliance Malfunction </option>    
-                                    <option value="Clogged or blocked drain">Clogged or blocked drain</option>
-                                    <option value="Pest infestation (e.g., insects or rodents)">Pest infestation (e.g., insects or rodents)</option>
-                                    <option value="Water damage or leakages">Water damage or leakages</option>
-                                    <option value="Faulty Electrical Outlet">Faulty Electrical Outlet</option>
-                                    <option value="Heating Issue">Heating Issue</option>
-                                    <option value="Broken windows or doors">Broken windows or doors</option>
-                                    <option value="Roof leaks or damage">Roof leaks or damage</option>
-                                    <option value="Insufficient or inconsistent water pressure">Insufficient or inconsistent water pressure</option>
-                                    <option value="Malfunctioning or non-responsive thermostat">Malfunctioning or non-responsive thermostat</option>
-                                    <option value="Inadequate lighting or electrical problems">Inadequate lighting or electrical problems</option>
-                                    <option value="Issues with locks or security systems">Issues with locks or security systems</option>
-                                    <option value="Broken or damaged flooring">Broken or damaged flooring</option>
-                                    <option value="Plumbing problems (e.g., toilet, shower, or sink issues)">Plumbing problems (e.g., toilet, shower, or sink issues)</option>
-                                    <option value="Structural damage (e.g., cracks in walls or ceilings)">Structural damage (e.g., cracks in walls or ceilings)</option>
-                                    <option value="Damaged or missing fixtures (e.g., cabinets, countertops)">Damaged or missing fixtures (e.g., cabinets, countertops)</option>
-                                </datalist>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="problemDescription" class="form-label">Problem Description</label>
-                                <textarea class="form-control" id="problemDescription" name="problemDescription" rows="4" required></textarea>
+                                <label for="date">Amount Paid </label>
+                                <div class="input-group">
+                                    <input type="text" name="currency" id="currency" class="form-control" value="ZMW" readonly>
+                                    <input type="text" name="amount" id="amount" class="form-control" required>
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <label for="date">Date Started</label>
-                                <input type="text" name="problemDate" id="problemDate" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="severity" class="form-label">Severity</label>
-                                <select class="form-control" id="severity" name="severity" required>
-                                    <option value="">Select severity level</option>
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
+                                <label for="date">Payment Mode </label>
+                                <select class="form-control" name="payment_mode" id="payment_mode">
+                                    <option value="">Select</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Mobile Money">Mobile Money</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="urgency" class="form-label">Urgency</label>
-                                <select class="form-control" id="urgency" name="urgency" required>
-                                    <option value="">Select urgency level</option>
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                </select>
+                                <label for="date">Payment Date </label>
+                                <input type="text" name="paymentDate" id="paymentDate" class="form-control" required>
                             </div>
                             <div class="mb-3">
-                                <label for="attachments" class="form-label">Attachments</label>
+                                <label for="attachments" class="form-label">Attach Payment Proof</label>
                                 <input type="file" class="form-control" id="attachments" name="attachments[]" multiple accept="image/*, .pdf">
                             </div>
                             <button type="submit" class="btn btn-primary">Submit</button>
-                        </form>
+                        </form> -->
+
+                        <div class="container">
+                            <h2>Pay Rental</h2>
+                            <form action="/pay-rentals" method="post">
+                                <input type="text" name="amount" placeholder="Amount" required>
+                                <input type="text" name="description" placeholder="Description" required>
+                                <input type="text" name="reference" placeholder="Reference" required>
+                                <input type="text" name="first_name" placeholder="First Name" required>
+                                <input type="text" name="last_name" placeholder="Last Name" required>
+                                <input type="email" name="email" placeholder="Email" required>
+                                <input type="tel" name="phone_number" placeholder="Phone Number" required>
+                                <select name="mobile_money_provider">
+                                    <option value="MTN">MTN</option>
+                                    <option value="Airtel">Airtel</option>
+                                    <option value="Zamtel">Zamtel</option>
+                                </select>
+                                <input type="submit" value="Pay Rentals">
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -143,160 +117,16 @@
     <?php include('../addon_footer_content.php')?>
   </div>
   <?php include('../addon_footer.php')?>
+  <script type="text/javascript">
+    function calculate() {
+        var amount = document.getElementById('amount');
+        varitemPrice = document.getElementById('item_price');
+        var quantity = document.getElementById('quantity');
+        amount.value = itemPrice.value * quantity.value;
+    }
 
-    <script>
-        
-    </script>
-</body>
-</html>
-<?php include('../../includes/db.php')?>
-<?php require('../addons/tip.php')?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <?php include('../addon_header.php')?>
-</head>
-<body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
-
-  <?php include('../addon_top_nav.php')?>
-  
-  <?php include('../addon_side_nav.php')?>
-  <div class="content-wrapper">
-    <?php include('../addon_content_head.php')?>
-    <section class="content">
-        
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Rental Payment History</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table table-responsive">
-                                <table class="table table-bordered" id="allTables">
-                                    <thead>
-                                        <tr>
-                                            <th>Rent ID</th>
-                                            <th>Month paid</th>
-                                            <th>Date Paid</th>
-                                            <th>Next Payment</th>
-                                            <th>Details</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    <?php 
-                                        $query = $connect->prepare("SELECT * FROM problem_reports WHERE reporter_id = ? ");
-                                        $query->execute([$_SESSION['phonenumber']]);
-                                        foreach($query->fetchAll() as $row){
-                                            extract($row);
-                                    ?>
-                                        <tr>
-                                            <td><?php echo $reference?></td>
-                                            <td><?php echo $problemType?></td>
-                                            <td><?php echo date("j F Y", strtotime($problemDate))?></td>
-                                            <td><?php echo ucwords($status)?></td>
-                                            <td><a href="<?php echo $reference?>" class="btn btn-primary btn-sm view_report_details"><i class="bi bi-box"></i> Details</a></td>
-                                        </tr>
-                                    <?php        
-                                        }
-                                    ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                            
-                        </div>
-                        <div class="card-footer">
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- tenants modal -->
-        <div class="modal fade" id="reportModal"  aria-labelledby="reportModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="reportModalLabel">Tenant Problem Report Form</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="problemReportForm" method="POST" enctype="multipart/form-data">
-                            <!-- <div class="mb-3">
-                                <label for="title">Problem Title</label>
-                                <input type="text" name="problemTitle" id="problemTitle" class="form-control" >
-                            </div> -->
-                            <div class="mb-3">
-                                <label for="problemType" class="form-label">Problem Type</label>
-                                <input type="text" class="form-control" id="problemType" name="problemType" list="problemTypes">
-                                <datalist id="problemTypes">
-                                    <option value="Appliance Malfunction"> Appliance Malfunction </option>    
-                                    <option value="Clogged or blocked drain">Clogged or blocked drain</option>
-                                    <option value="Pest infestation (e.g., insects or rodents)">Pest infestation (e.g., insects or rodents)</option>
-                                    <option value="Water damage or leakages">Water damage or leakages</option>
-                                    <option value="Faulty Electrical Outlet">Faulty Electrical Outlet</option>
-                                    <option value="Heating Issue">Heating Issue</option>
-                                    <option value="Broken windows or doors">Broken windows or doors</option>
-                                    <option value="Roof leaks or damage">Roof leaks or damage</option>
-                                    <option value="Insufficient or inconsistent water pressure">Insufficient or inconsistent water pressure</option>
-                                    <option value="Malfunctioning or non-responsive thermostat">Malfunctioning or non-responsive thermostat</option>
-                                    <option value="Inadequate lighting or electrical problems">Inadequate lighting or electrical problems</option>
-                                    <option value="Issues with locks or security systems">Issues with locks or security systems</option>
-                                    <option value="Broken or damaged flooring">Broken or damaged flooring</option>
-                                    <option value="Plumbing problems (e.g., toilet, shower, or sink issues)">Plumbing problems (e.g., toilet, shower, or sink issues)</option>
-                                    <option value="Structural damage (e.g., cracks in walls or ceilings)">Structural damage (e.g., cracks in walls or ceilings)</option>
-                                    <option value="Damaged or missing fixtures (e.g., cabinets, countertops)">Damaged or missing fixtures (e.g., cabinets, countertops)</option>
-                                </datalist>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="problemDescription" class="form-label">Problem Description</label>
-                                <textarea class="form-control" id="problemDescription" name="problemDescription" rows="4" required></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="date">Date Started</label>
-                                <input type="text" name="problemDate" id="problemDate" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="severity" class="form-label">Severity</label>
-                                <select class="form-control" id="severity" name="severity" required>
-                                    <option value="">Select severity level</option>
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="urgency" class="form-label">Urgency</label>
-                                <select class="form-control" id="urgency" name="urgency" required>
-                                    <option value="">Select urgency level</option>
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="attachments" class="form-label">Attachments</label>
-                                <input type="file" class="form-control" id="attachments" name="attachments[]" multiple accept="image/*, .pdf">
-                            </div>
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-      </section>
-    </div>
-    <?php include('../addon_footer_content.php')?>
-  </div>
-  <?php include('../addon_footer.php')?>
-
-    <script>
-        
+    // calculate on page load
+    calculate();
     </script>
 </body>
 </html>

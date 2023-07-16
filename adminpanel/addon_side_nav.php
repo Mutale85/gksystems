@@ -72,7 +72,12 @@
                     <p>Farm Employees </p>
                   </a>
                 </li>
-                
+                <li class="nav-item">
+                  <a href="farms/farm-properties" class="nav-link">
+                    <i class="bi bi-basket nav-icon"></i>
+                    <p>Farm Property</p>
+                  </a>
+                </li>
                 <li class="nav-item">
                   <a href="reports/" class="nav-link">
                     <i class="bi bi-flag nav-icon"></i>
@@ -124,6 +129,42 @@
                   <a href="accounts/income" class="nav-link">
                     <i class="bi bi-wallet nav-icon"></i>
                     <p>Income & Expense </p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="accounts/rental-income" class="nav-link">
+                    <i class="bi bi-wallet nav-icon"></i>
+                    <p>Rental Income </p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="accounts/vehicle-income" class="nav-link">
+                    <i class="bi bi-wallet nav-icon"></i>
+                    <p>Vehicle Income </p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="accounts/rental-expense" class="nav-link">
+                    <i class="bi bi-wallet nav-icon"></i>
+                    <p>Rental expense </p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="accounts/vehicle-expense" class="nav-link">
+                    <i class="bi bi-wallet nav-icon"></i>
+                    <p>Vehicle expense </p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="accounts/petty-cash" class="nav-link">
+                    <i class="bi bi-wallet nav-icon"></i>
+                    <p>Petty Cash </p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="accounts/loans" class="nav-link">
+                    <i class="bi bi-wallet nav-icon"></i>
+                    <p>Loans </p>
                   </a>
                 </li>
                 <li class="nav-item">
@@ -206,7 +247,12 @@
                     <p>Estate Team </p>
                   </a>
                 </li>
-
+                <li class="nav-item">
+                  <a href="real-estates/properties" class="nav-link">
+                    <i class="bi bi-house nav-icon"></i>
+                    <p>Property Management </p>
+                  </a>
+                </li>
                 <li class="nav-item">
                   <a href="real-estates/tenants" class="nav-link">
                     <i class="bi bi-people nav-icon"></i>
@@ -244,7 +290,18 @@
                     <p>Transport Team </p>
                   </a>
                 </li>
-                
+                <li class="nav-item">
+                  <a href="transport-logistics/vehicle-assets" class="nav-link">
+                    <i class="bi bi-car-front nav-icon"></i>
+                    <p>Vehicle Assets</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="transport-logistics/servicibiity" class="nav-link">
+                    <i class="bi bi-car-front nav-icon"></i>
+                    <p>Vehicle Servicibilty</p>
+                  </a>
+                </li>
                 <li class="nav-item">
                   <a href="reports/" class="nav-link">
                     <i class="bi bi-flag nav-icon"></i>
@@ -269,12 +326,7 @@
                     <p>Employees</p>
                   </a>
                 </li>
-                <!-- <li class="nav-item">
-                  <a href="employees/departments" class="nav-link">
-                    <i class="bi bi-wallet2 nav-icon"></i>
-                    <p>Departments</p>
-                  </a>
-                </li> -->
+                
                 <li class="nav-item">
                   <a href="employees/sms-team-member" class="nav-link">
                     <i class="bi bi-reply nav-icon"></i>
@@ -284,30 +336,6 @@
               </ul>
             </li>
 
-            <!-- <li class="nav-item">
-              <a href="#" class="nav-link bg-danger">
-                <i class="nav-icon bi bi-flag-fill"></i>
-                <p>
-                  Reports
-                  <i class="fas fa-angle-left right"></i>
-                </p>
-              </a>
-              <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <a href="debtors/add-new-debtor" class="nav-link">
-                    <i class="bi bi-folder nav-icon"></i>
-                    <p>Create Report</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="debtors/" class="nav-link">
-                    <i class="bi bi-flag nav-icon"></i>
-                    <p>View Reports</p>
-                  </a>
-                </li>
-              </ul>
-            </li> -->
-          
             <li class="nav-item">
               <a href="reports/" class="nav-link">
                 <i class="nav-icon bi bi-flag"></i>
@@ -392,6 +420,12 @@
             <?php endif;?>
 
             <?php if($_SESSION['department'] == "transport-logistics"):?>
+              <li class="nav-item">
+                  <a href="members/vehicle-income" class="nav-link">
+                    <i class="bi bi-wallet nav-icon"></i>
+                    <p>Vehicle income </p>
+                  </a>
+                </li>
               <li class="nav-item">
                 <a href="members/incident-report" class="nav-link">
                   <i class="bi bi-gear nav-icon"></i>

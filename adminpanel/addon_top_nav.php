@@ -22,10 +22,10 @@
     <ul class="navbar-nav ml-auto">
         <!-- Navbar Search -->
         <li class="nav-item">
-            <a class="nav-link" data-widget="navbar-search" href="#" role="button">
+            <!-- <a class="nav-link" data-widget="navbar-search" href="#" role="button">
                 <i class="fas fa-search"></i>
-            </a>
-            <div class="navbar-search-block">
+            </a> -->
+            <!-- <div class="navbar-search-block">
                 <form class="form-inline">
                     <div class="input-group input-group-sm">
                         <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
@@ -39,7 +39,7 @@
                         </div>
                     </div>
                 </form>
-            </div>
+            </div> -->
         </li>
 
         <!-- Messages Dropdown Menu -->
@@ -50,7 +50,7 @@
                     $reports = $query->rowCount();
                 ?>
             <a class="nav-link" data-toggle="dropdown" href="#">
-                <i class="far fa-comments"></i>
+                <i class="bi bi-comments"></i>
                 <span class="badge badge-danger navbar-badge"><?php echo $reports?></span>
             </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
@@ -65,10 +65,10 @@
                             <div class="media-body">
                             <h3 class="dropdown-item-title">
                                 <?php echo $names?>
-                                <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                <span class="float-right text-sm text-danger"><i class="bi bi-star"></i></span>
                             </h3>
                                 <p class="text-sm"><?php echo $problemType?></p>
-                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> <?php echo time_ago_check($date_submitted) ?></p>
+                                <p class="text-sm text-muted"><i class="bi bi-clock mr-1"></i> <?php echo time_ago_check($date_submitted) ?></p>
                             </div>
                         </div>
                     <!-- Message End -->

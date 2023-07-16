@@ -9,6 +9,7 @@
         $department = filter_input(INPUT_POST, 'department', FILTER_SANITIZE_SPECIAL_CHARS);
         $job_title = filter_input(INPUT_POST, 'job_title', FILTER_SANITIZE_SPECIAL_CHARS);
         $user_role = filter_input(INPUT_POST, 'user_role', FILTER_SANITIZE_SPECIAL_CHARS);
+        $employee_contract = filter_input(INPUT_POST, 'employee_contract', FILTER_SANITIZE_SPECIAL_CHARS);
         $parent_id = $_SESSION['parent_id'];
         $pw =  '123456';
         $password = password_hash($pw, PASSWORD_DEFAULT);
@@ -36,12 +37,12 @@
                 $department = $department;
             }
         
-            $sql = $connect->prepare("INSERT INTO `team_members`(`username`, `firstname`, `lastname`, `email`, `password`, `pass_w`, `phonenumber`, `parent_id`, `user_role`, `department`, `job_title`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
-            $sql->execute([$firstname, $firstname, $lastname, $email, $password, $pw, $phonenumber, $parent_id, $user_role, $department, $job_title]);
+            $sql = $connect->prepare("INSERT INTO `team_members`(`username`, `firstname`, `lastname`, `email`, `password`, `pass_w`, `phonenumber`, `parent_id`, `user_role`, `department`, `job_title`, `employee_contract`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+            $sql->execute([$firstname, $firstname, $lastname, $email, $password, $pw, $phonenumber, $parent_id, $user_role, $department, $job_title, $employee_contract]);
             echo ' Employee named '.$firstname. ' '. $lastname. '  added successfully';
         }else{
-            $update = $connect->prepare(" UPDATE `team_members` SET `username` = ?, `firstname` = ?, `lastname` = ?, `email` = ?,  `phonenumber` = ?,  `user_role` = ?, `department` = ?, job_title = ? WHERE id = ? ");
-            $update->execute([$firstname, $firstname, $lastname, $email, $phonenumber, $user_role, $department, $job_title, $employe_id ]);
+            $update = $connect->prepare(" UPDATE `team_members` SET `username` = ?, `firstname` = ?, `lastname` = ?, `email` = ?,  `phonenumber` = ?,  `user_role` = ?, `department` = ?, job_title = ?, `employee_contract` = ? WHERE id = ? ");
+            $update->execute([$firstname, $firstname, $lastname, $email, $phonenumber, $user_role, $department, $job_title, $employee_contract, $employe_id ]);
             echo ' Employees data updated successfully';
         }
     }

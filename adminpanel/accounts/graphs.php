@@ -31,7 +31,7 @@
         $(document).ready(function() {
             // Function to fetch income and expense data and create the ApexCharts graph
            // Call the function to create the graph
-            createGraph();
+            
         });
 
     </script>

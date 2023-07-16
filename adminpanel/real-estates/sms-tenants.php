@@ -31,34 +31,35 @@
                             <h4 class="card-title">Tenants</h4>
                         </div>
                         <div class="card-body">
-                            <table id="tenantsTable" class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th><input type="checkbox" id="selectAll"></th>
-                                        <th>Tenant ID</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Employee data will be dynamically added here -->
-                                </tbody>
-                            </table>
+                            <div class="table table-responsive">
+                                <table id="tenantTable" class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="selectAllTenants"></th>
+                                            <th>Tenant ID</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Employee data will be dynamically added here -->
+                                    </tbody>
+                                </table>
+                            </div>
                                 
-                                <div id="messageForm" class="mt-3">
-                                    <div class="mb-3">
-                                        <label for="messageType" class="form-label">Message Type:</label>
-                                        <select id="messageType" class="form-control">
-                                            <option value="sms">SMS</option>
-                                            <option value="email">Email</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="messageContent" class="form-label">Message Content:</label>
-                                        <textarea id="messageContent" class="form-control" rows="5"></textarea>
-                                    </div>
-                                    <button id="sendMessageButton" class="btn btn-primary">Send Message</button>
+                            <div id="messageForm" class="mt-3">
+                                <div class="mb-3">
+                                    <label for="messageType" class="form-label">Message Type:</label>
+                                    <select id="messageType" class="form-control">
+                                        <option value="sms">SMS</option>
+                                        <option value="email">Email</option>
+                                    </select>
                                 </div>
+                                <div class="mb-3">
+                                    <label for="messageContent" class="form-label">Message Content:</label>
+                                    <textarea id="messageContent" class="form-control" rows="5"></textarea>
+                                </div>
+                                <button id="sendTenantButton" class="btn btn-primary">Send Message</button>
                             </div>
                         </div>
                         <div class="card-footer"></div>

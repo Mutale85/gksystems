@@ -1,5 +1,6 @@
 <?php 
     include("../../includes/db.php");
+    include("../../includes/conf.php");
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
@@ -15,8 +16,17 @@
                 $stmt = $connect->prepare('INSERT INTO task_assignments ( employeeId, reference, special_instructions) VALUES (?, ?, ?)');
                 $stmt->execute([$employeeId, $reference, $special_instructions]);
                 // we will send sms to employees
+                $message = 'You have been assigned a task, please make sure its done and report ';
+                echo SEND_SMSNOW($employeeId, $message, API, SENDER);
             }
             echo 'Task assigend to the selected employees';
+
+            
+            $message = 'Task has been has been assigned to employees ';
+            $to = '+260970448181';
+            echo SEND_SMSNOW($to, $message, API, SENDER);
+            $to = '+260976330092';
+            echo SEND_SMSNOW($to, $message, API, SENDER);
         }
 
     }

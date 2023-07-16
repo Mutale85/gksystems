@@ -1,5 +1,6 @@
 <?php 
     include("../../includes/db.php");
+    include("../../includes/conf.php");
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $names = filter_input(INPUT_POST, 'names', FILTER_SANITIZE_SPECIAL_CHARS);
@@ -17,7 +18,14 @@
         $stmt = $connect->prepare('INSERT INTO problem_reports (`reporter_id`, `names`, `email`, `problemType`, `problemDescription`, `problemDate`, `severity`, `urgency`, `reference`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
         $stmt->execute([$reporter_id, $names, $email, $problemType, $problemDescription, $problemDate, $severity, $urgency, $reference]);
         $reportId = $connect->lastInsertId();
-      
+        $message = 'Your report has been sent';
+        echo SEND_SMSNOW($reporter_id, $message, API, SENDER);
+        // send a message to superadmin
+        $message = $problemType. ' has been reported ';
+        $to = '+260970448181';
+        echo SEND_SMSNOW($to, $message, API, SENDER);
+        $to = '+260976330092';
+        echo SEND_SMSNOW($to, $message, API, SENDER);
         // Handle file uploads
         $attachments = $_FILES['attachments'];
       
